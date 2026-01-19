@@ -1051,7 +1051,6 @@ def admin_update_txn(id):
         return_date = request.form.get("return_date")
         fine = request.form.get("fine")
         item_type = request.form.get("item_type")
-        status = request.form.get("status")
         
         conn = get_db()
         updates = []
@@ -1075,9 +1074,6 @@ def admin_update_txn(id):
         if item_type and item_type.strip():
             updates.append("item_type = ?")
             params.append(item_type)
-        if status and status.strip():
-            updates.append("status = ?")
-            params.append(status)
         
         if updates:
             params.append(id)
@@ -1433,7 +1429,7 @@ def librarian_return_book(book_id):
             # Update transaction with return date and final fine
             conn.execute("""
                 UPDATE Transactions 
-                SET return_date = ?, status = 'Returned', fine = ?
+                SET return_date = ?, fine = ?
                 WHERE transaction_id = ?
             """, (today, final_fine, transaction['transaction_id']))
             
@@ -1805,8 +1801,8 @@ def student_borrow():
         item_type = book['type'] if book else 'Physical'
         
         conn.execute("""
-            INSERT INTO Transactions (patron_id, book_id, borrow_date, return_date, fine, item_type, status) 
-            VALUES (?,?,?,?,?,?,'Borrowed')
+            INSERT INTO Transactions (patron_id, book_id, borrow_date, return_date, fine, item_type) 
+            VALUES (?,?,?,?,?,?)
         """, (patron_id, book_id, borrow_date, None, 0, item_type))
         
         # Only update availability for physical books
@@ -1852,7 +1848,7 @@ def student_return(transaction_id):
             # Update transaction with return date and final fine
             conn.execute("""
                 UPDATE Transactions 
-                SET return_date = ?, status = 'Returned', fine = ?
+                SET return_date = ?, fine = ?
                 WHERE transaction_id = ? AND patron_id = ?
             """, (today, final_fine, transaction_id, patron_id))
             
