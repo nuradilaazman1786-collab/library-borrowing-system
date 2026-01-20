@@ -5,8 +5,13 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 app.secret_key = "nuradila_secret"
 
+import os
+import sqlite3
+
 def get_db():
-    conn = sqlite3.connect("library.db")
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DB_PATH = os.path.join(BASE_DIR, "library.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
