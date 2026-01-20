@@ -1,18 +1,18 @@
 from flask import Flask, request, session, redirect
-import sqlite3
 from datetime import datetime, timedelta
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 app.secret_key = "nuradila_secret"
 
-import os
-import sqlite3
-
 def get_db():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    DB_PATH = os.path.join(BASE_DIR, "library.db")
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+    if not DATABASE_URL:
+        raise Exception("DATABASE_URL not set in environment variables")
+
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
     return conn
 
 # ==================== GLOBAL DESIGN ====================
