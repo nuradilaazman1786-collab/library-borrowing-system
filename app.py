@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import os
 import pg8000
 from urllib.parse import urlparse
-import ssl
 
 app = Flask(__name__)
 app.secret_key = "nuradila_secret"
@@ -13,11 +12,7 @@ def get_db():
     if not DATABASE_URL:
         raise Exception("DATABASE_URL not set in environment variables")
 
-    # Parse connection string: postgres://user:password@host:port/dbname
     url = urlparse(DATABASE_URL)
-
-    # Supabase perlukan SSL
-    ssl_context = ssl.create_default_context()
 
     conn = pg8000.connect(
         user=url.username,
@@ -25,7 +20,7 @@ def get_db():
         host=url.hostname,
         port=url.port,
         database=url.path[1:],  # buang '/' di depan dbname
-        ssl_context=ssl_context
+        ssl=True  # ini yang betul untuk pg8000.connect()
     )
     return conn
 
