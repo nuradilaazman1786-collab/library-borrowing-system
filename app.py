@@ -70,6 +70,18 @@ style = """
 """
 def end(): return "</div>"
 
+@app.route("/test_db")
+def test_db():
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1;")
+        result = cursor.fetchone()
+        conn.close()
+        return f"DB connection OK, result: {result}"
+    except Exception as e:
+        return f"DB connection failed: {e}"
+
 # ==================== HELPER FUNCTIONS ====================
 def calculate_fine(borrow_date, return_date=None):
     """Calculate fine based on borrow date"""
