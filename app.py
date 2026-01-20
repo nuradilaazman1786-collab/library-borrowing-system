@@ -1,8 +1,9 @@
 from flask import Flask, request, session, redirect
 from datetime import datetime, timedelta
 import os
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import pg8000
+from urllib.parse import urlparse
+import ssl
 
 app = Flask(__name__)
 app.secret_key = "nuradila_secret"
@@ -12,7 +13,20 @@ def get_db():
     if not DATABASE_URL:
         raise Exception("DATABASE_URL not set in environment variables")
 
-    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    # Parse connection string: postgres://user:password@host:port/dbname
+    url = urlparse(DATABASE_URL)
+
+    # Supabase perlukan SSL
+    ssl_context = ssl.create_default_context()
+
+    conn = pg8000.connect(
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port,
+        database=url.path[1:],  # buang '/' di depan dbname
+        ssl_context=ssl_context
+    )
     return conn
 
 # ==================== GLOBAL DESIGN ====================
