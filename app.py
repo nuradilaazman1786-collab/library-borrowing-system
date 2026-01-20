@@ -1,27 +1,13 @@
 from flask import Flask, request, session, redirect
 from datetime import datetime, timedelta
-import os
-import pg8000
-from urllib.parse import urlparse
+import sqlite3
 
 app = Flask(__name__)
 app.secret_key = "nuradila_secret"
 
 def get_db():
-    DATABASE_URL = os.environ.get("DATABASE_URL")
-    if not DATABASE_URL:
-        raise Exception("DATABASE_URL not set in environment variables")
-
-    url = urlparse(DATABASE_URL)
-
-    conn = pg8000.connect(
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port,
-        database=url.path[1:],  # buang '/' di depan dbname
-        ssl=True  # ini yang betul untuk pg8000.connect()
-    )
+    # Guna SQLite local file
+    conn = sqlite3.connect("library.db")
     return conn
 
 # ==================== GLOBAL DESIGN ====================
